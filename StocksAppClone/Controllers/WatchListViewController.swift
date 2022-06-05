@@ -9,6 +9,10 @@ import UIKit
 
 class WatchListViewController: UIViewController {
 
+    //MARK: - Properties
+    private let dateFormatterHandler = DateFormatterHandler.shared
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTitleView()
@@ -31,7 +35,7 @@ class WatchListViewController: UIViewController {
         
         let dateTitleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: view.width, height: navigationController?.navigationBar.height ?? 100))
         dateTitleLabel.textAlignment = .left
-        dateTitleLabel.text = "DATE"
+        dateTitleLabel.text = dateFormatterHandler.GetCurrentDateAsString()
         dateTitleLabel.font = .systemFont(ofSize: 20, weight: .heavy)
         dateTitleLabel.textColor = .systemGray
         
@@ -43,9 +47,9 @@ class WatchListViewController: UIViewController {
         titleStackView.axis = .vertical
     
         navigationItem.titleView = titleStackView
-        
-        // we need to get the DATE to display the actual date and this will be done via a DateFormatter
     }
+    
+    
     
     
     // MARK: - Functions
