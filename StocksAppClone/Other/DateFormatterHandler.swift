@@ -9,8 +9,22 @@ import Foundation
 
 final class DateFormatterHandler
 {
+    //MARK: - Properties
     static let shared = DateFormatterHandler()
-    private let dateFormatter = DateFormatterHandler()
+    private let dateFormatter = DateFormatter()
+    // MARK: - Functions
+    
+    internal func GetCurrentDateAsString() -> String
+    {
+        let currentDate = Date()
+        dateFormatter.dateStyle = .medium
+        dateFormatter.timeStyle = .none
+        let dateAsString = dateFormatter.string(from: currentDate)
+        return dateAsString
+    }
+
+    
     
     
 }
+
