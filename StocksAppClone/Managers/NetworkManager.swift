@@ -18,24 +18,44 @@ final class NetworkManager
     
     
     // internal functions
-    func getStockInfo()
+    internal func search(query : String, completion : @escaping(Result<StockSearchResult,Error>) -> Void)
     {
-        
-        
-        
+        guard let url = createURL(for: .search, queryParams: ["q" : query]) else {
+            completion(.failure(NetworkError.invalidURL))
+            return
+        }
+        request(url: url, expecting: StockSearchResult.self) { searchResult in
+            switch searchResult
+            {
+            case .success(let stockSearchResultObj):
+                completion(.success(stockSearchResultObj))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
     }
     
-    
-    func searchForStock()
-    {
-        
-        
-    }
     
     // private functions
     private func createURL(for endpoint : Endpoint, queryParams : [String : String]) -> URL?
     {
-        return nil
+        var urlString = Constants.baseURL
+        urlString += endpoint.rawValue
+        
+        var queryItems = [URLQueryItem]()
+        for (name,value) in queryParams
+        {
+            let queryItemToAppend = URLQueryItem(name: name, value: value)
+            queryItems.append(queryItemToAppend)
+        }
+        // adding in our api key at the end
+        queryItems.append(.init(name: "token", value: Constants.apiKey))
+        
+        // Convert query array to suffix so we can add to url
+        let queryStringArray = queryItems.map { "\($0.name)=\($0.value ?? "")" }.joined(separator: "&")
+        urlString += "?" + queryStringArray
+        
+        return URL(string: urlString)
     }
     
     private func request<T:Codable>(url : URL?, expecting : T.Type, completion : @escaping(Result<T,Error>) -> Void)
@@ -78,9 +98,9 @@ final class NetworkManager
 
 private struct Constants
 {
-    static let apiKey = ""
-    static let sandboxApiKey = ""
-    static let baseURL = ""
+    static let apiKey = "caf66eiad3ibf4h8sjtg"
+    static let sandboxApiKey = "sandbox_c59jcq2ad3i93kd1rbng"
+    static let baseURL = "https://finnhub.io/api/v1/"
 }
 
 
