@@ -45,5 +45,19 @@ class PersistenceManagerTestCase: XCTestCase {
             // here this means that it does not contain the symbol so the test should pass
         }
     }
-
+    
+    func test_RemoveFromWatchList_whenWatchListHasOneItem()
+    {
+        let arrayToTest = ["APPL"]
+        persistenceManagerHandler.watchList = arrayToTest
+        persistenceManagerHandler.removeFromWatchList(symbolToRemoveString: "APPL")
+        if(persistenceManagerHandler.watchList.contains("APPL"))
+        {
+            XCTFail("Deletion operation has failed with only one element")
+        }
+        else
+        {
+            // here this mean it does not contain the symbol and it should pass
+        }
+    }
 }
