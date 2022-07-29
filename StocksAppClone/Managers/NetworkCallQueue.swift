@@ -7,41 +7,47 @@
 
 import Foundation
 
-struct NetworkCallQueue
+class NetworkCallQueue
 {
     // properties
-    private let runningTask : URLSessionDataTask
-    private var underlyingArray : [URLSessionDataTask] = [URLSessionDataTask]()
+    private var underlyingArray = [URLSessionDataTask]()
+    static let shared = NetworkCallQueue()
     
-    // initializer
-    init(taskToRun : URLSessionDataTask)
-    {
-        runningTask = taskToRun
-    }
     
-    // MARK: - Functions
-    
-    // this function will add to the queue
-    internal mutating func addDataTask(newDataTaskToAdd : URLSessionDataTask)
-    {
-        // we are calling remove as we always want to check if a dataTask is alredy inside before we add a new one
-        removeDataTask()
-        underlyingArray.append(newDataTaskToAdd)
-    }
-    
-    // this function will remove from the queue
-    private mutating func removeDataTask()
+    // MARK: - Functionality
+    internal func peek() -> Bool
     {
         if(underlyingArray.count == 0)
         {
-            return
+            return false
         }
         else
         {
-            let dataTask  = underlyingArray[0]
-            dataTask.cancel()
-            underlyingArray.removeLast()
+            return true
         }
     }
-
+    
+    private func removeFromQueue()
+    {
+        let dataTask = underlyingArray[0]
+        dataTask.cancel()
+        underlyingArray.removeLast()
+    }
+    
+    
+    internal func addDataTask(dataTask : URLSessionDataTask)
+    {
+        let peekResult = peek()
+        switch peekResult
+        {
+        case true:
+            removeFromQueue()
+            dataTask.resume()
+            underlyingArray.append(dataTask)
+        case false:
+            dataTask.resume()
+            underlyingArray.append(dataTask)
+        }
+    }
+    
 }
