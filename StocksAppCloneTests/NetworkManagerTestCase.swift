@@ -20,13 +20,21 @@ class NetworkManagerTestCase: XCTestCase {
 
     func test_Search()
     {
+        let exp = self.expectation(description: "The search functionality has succeeded")
         let networkManager = NetworkManager.shared
         let stockSymbol = "Apple"
+        
+        defer {
+            waitForExpectations(timeout: 5, handler: nil)
+        }
+        
         networkManager.search(query: stockSymbol) { searchResult in
             switch searchResult
             {
             case .success(let stockSearchResult):
+                print(stockSearchResult.result)
                 XCTAssertTrue(stockSearchResult.result.count != 0)
+                exp.fulfill()
             case .failure(let error):
                 XCTFail(error.localizedDescription)
             }
