@@ -6,6 +6,7 @@
 //
 
 import XCTest
+@testable import StocksAppClone
 
 class NetworkCallQueueTestCase: XCTestCase {
 
@@ -17,19 +18,33 @@ class NetworkCallQueueTestCase: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
-    }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+    func test_NetworkCallQueue_WithOneDataTask()
+    {
+        let dummyURL = URL(string: "DUMMY")!
+        let fakeTask = URLSession.shared.dataTask(with: dummyURL)
+        NetworkCallQueue.shared.addDataTask(dataTask: fakeTask)
+        let peekResult = NetworkCallQueue.shared.peek()
+        if(peekResult == false)
+        {
+            XCTFail("The dataTask did not get added properly to the networkCallQueue")
         }
+        
+    }
+    
+    func test_NetworkCallQueue_WithTwoDataTask()
+    {
+        let dummyURL = URL(string: "DUMMY")!
+        let fakeTaskOne = URLSession.shared.dataTask(with: dummyURL)
+        let fakeTaskTwo = URLSession.shared.dataTask(with: dummyURL)
+        NetworkCallQueue.shared.addDataTask(dataTask: fakeTaskOne)
+        NetworkCallQueue.shared.addDataTask(dataTask: fakeTaskTwo)
+        
+        let peekResult = NetworkCallQueue.shared.peek()
+        if(peekResult == false)
+        {
+            XCTFail()
+        }
+        
     }
 
 }
