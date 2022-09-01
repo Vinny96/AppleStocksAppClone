@@ -10,12 +10,12 @@ import Foundation
 struct NewsResult : Codable
 {
     var category : String
-    var datetime : Int
+    var datetime : TimeInterval
     var headline : String
     var id : Int
-    var image : URL
+    var image : String
     var related : String
     var source : String
     var summary : String
-    var url : URL
+    var url : String
 }
