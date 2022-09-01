@@ -60,6 +60,30 @@ final class NetworkManager
         }
     }
     
+    internal func getNewsForCompany(stockSymbol : String, completion : @escaping(Result<[NewsResult],Error>) -> Void)
+    {
+        // first thing we need to do is create the URL
+        let arrayOfDates = DateFormatterHandler.shared.createDatesAsStringForCompanyNews()
+        let currentDateAsString = arrayOfDates[0]
+        let previousDateAsString = arrayOfDates[1]
+        let queryParams : [String : String] = ["symbol" : stockSymbol, "from" : previousDateAsString, "to" : currentDateAsString]
+        
+        guard let safeURL = createURL(for: .companyNews, queryParams: queryParams) else {
+            completion(.failure(NetworkError.invalidURL))
+            return
+        }
+        
+        // now that we have the URL we need to call the request function
+        request(url: safeURL, expecting: [NewsResult].self) { result in
+            switch result
+            {
+            case .success(let newsResultObj):
+                completion(.success(newsResultObj))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
     
     // private functions
     private func createURL(for endpoint : Endpoint, queryParams : [String : String]) -> URL?
