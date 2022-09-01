@@ -20,7 +20,11 @@ final class NetworkManager
     // internal functions
     internal func search(query : String, completion : @escaping(Result<StockSearchResult,Error>) -> Void)
     {
-        guard let url = createURL(for: .search, queryParams: ["q" : query]) else {
+        guard let safeQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+            completion(.failure(NetworkError.invalidURL))
+            return
+        }
+        guard let url = createURL(for: .search, queryParams: ["q" : safeQuery]) else {
             completion(.failure(NetworkError.invalidURL))
             return
         }
@@ -29,6 +33,27 @@ final class NetworkManager
             {
             case .success(let stockSearchResultObj):
                 completion(.success(stockSearchResultObj))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    internal func getTopNews(completion : @escaping(Result<[NewsResult],Error>) -> Void)
+    {
+        // the first thing we need to do is create the url for the top stories
+        // so we will need to create the query for this first
+        let queryParams : [String : String] = ["category" : "general"]
+        guard let safeURL = createURL(for: .news, queryParams: queryParams) else {
+            completion(.failure(NetworkError.invalidURL))
+            return
+        }
+        // so now we have the url and now we can perform the search
+        request(url: safeURL, expecting: [NewsResult].self) { result in
+            switch result
+            {
+            case .success(let topNewsResultObjArray):
+                completion(.success(topNewsResultObjArray))
             case .failure(let error):
                 completion(.failure(error))
             }
@@ -89,11 +114,10 @@ final class NetworkManager
                 completion(.failure(error))
             }
         }
-        task.resume()
+        // put into queue here
+        let networkQueue = NetworkCallQueue.shared
+        networkQueue.addDataTask(dataTask: task)
     }
-    
-    
-    
 }
 
 private struct Constants
@@ -108,6 +132,7 @@ private enum Endpoint : String
 {
     case search
     case news
+    case companyNews = "company-news"
 }
 
 private enum NetworkError : Error
@@ -115,3 +140,5 @@ private enum NetworkError : Error
     case invalidURL
     case noDataReturned
 }
+
+

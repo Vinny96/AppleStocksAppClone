@@ -43,6 +43,14 @@ final class PersistanceManager
     func removeFromWatchList(symbolToRemoveString : String) -> [String]
     {
         var indexPos = 0
+        // this code is for situations in which there is only one symbol int he watchList
+        if(watchList.count == 1)
+        {
+            watchList.removeLast()
+            return watchList
+        }
+        
+        // the for loop is for the situation in which there is more than 1 symbol in the watchlist
         for symbol in watchList
         {
             if(symbol == symbolToRemoveString)

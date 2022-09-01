@@ -20,4 +20,6 @@ final class HapticsManager
     {
         // vibrate lightly for tap selection
     }
+    
+    // we need a vibrate for type function
 }

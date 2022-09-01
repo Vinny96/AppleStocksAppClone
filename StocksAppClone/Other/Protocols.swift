@@ -9,10 +9,20 @@ import Foundation
 
 protocol DidSelectSearchResultCell
 {
-    func searchResultSelected(model : String) // when the model is created, the model will no longer be of type string
+    func searchResultSelected(model : Stock) // when the model is created, the model will no longer be of type string
 }
 
 protocol NetworkCallComplete
 {
-    func retrievedData(model : String) // when the model is created, the model will no longer be of type string
+    func retrievedData(model : StockSearchResult) // when the model is created, the model will no longer be of type string
+}
+
+protocol NewsHeaderViewDelegate : AnyObject
+{
+    func didTapAddButton(headerView : NewsHeaderView)
+}
+
+protocol NewsFetched
+{
+    func retrievedData(model : NewsResult)
 }

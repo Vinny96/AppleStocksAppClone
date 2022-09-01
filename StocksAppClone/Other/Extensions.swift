@@ -36,3 +36,15 @@ extension UIView
     }
     
 }
+
+//MARK: - Extending UIView
+extension UIView
+{
+    func addSubviews(viewsToAdd : UIView...)
+    {
+        viewsToAdd.forEach { viewToAdd in
+            self.addSubview(viewToAdd)
+        }
+    }
+}
+

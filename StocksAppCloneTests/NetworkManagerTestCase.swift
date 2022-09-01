@@ -41,7 +41,25 @@ class NetworkManagerTestCase: XCTestCase {
         }
     }
     
-    // MARK: - MAking URL Code
+   func test_GetTopStories()
+    {
+        let expectation = self.expectation(description: "The top stories functionality has succeeded")
+        let networkManager = NetworkManager.shared
+        defer {
+            waitForExpectations(timeout: 5, handler: nil)
+        }
+        networkManager.getTopNews { result in
+            switch result
+            {
+            case .success(let topNewsResultArray):
+                XCTAssert(topNewsResultArray.isEmpty == false)
+                expectation.fulfill()
+            case .failure(let error):
+                print(error)
+                XCTFail(error.localizedDescription)
+            }
+        }
+    }
     
 
 }

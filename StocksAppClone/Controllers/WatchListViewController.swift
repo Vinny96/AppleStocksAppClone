@@ -6,18 +6,23 @@
 //
 
 import UIKit
+import FloatingPanel
+
 
 class WatchListViewController: UIViewController {
 
     //MARK: - Properties
     private let dateFormatterHandler = DateFormatterHandler.shared
+    private var searchTimer : Timer?
+    private var floatingPanel : FloatingPanelController?
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupTitleView()
         initializeVC()
         setupSearchController()
+        setupFloatingPanel()
+        setupTitleView()
     }
     
     //MARK: - UI Variables
@@ -49,7 +54,16 @@ class WatchListViewController: UIViewController {
         navigationItem.titleView = titleStackView
     }
     
-    
+    private func setupFloatingPanel()
+    {
+        let contentVC = NewsViewController(controllerTypeVal: .topStories)
+        let panel = FloatingPanelController()
+        panel.delegate = self
+        panel.contentViewController = contentVC
+        panel.surfaceView.backgroundColor = .secondarySystemBackground
+        panel.addPanel(toParent: self)
+        panel.track(scrollView: contentVC.newsTableView)
+    }
     
     
     // MARK: - Functions
@@ -61,6 +75,7 @@ class WatchListViewController: UIViewController {
     func setupSearchController()
     {
         let searchResultsVC = SearchResultsViewController()
+        searchResultsVC.selectionDelegate = self
         let searchVC = UISearchController(searchResultsController: searchResultsVC)
         searchVC.searchResultsUpdater = self
         navigationItem.searchController = searchVC
@@ -80,19 +95,48 @@ extension WatchListViewController : UISearchResultsUpdating
         guard let resultsVC = searchController.searchResultsController as? SearchResultsViewController else {
             return
         }
-        // now that we have the safeQuery we can call our request function from out NetworkManager and use those results to update these results
-        
+        // now that we have the safeQuery we can call our request function from our NetworkManager and use those results to update these results
         // we want to call the api
-        
-        
-        // we want to optimize the API calls so the API is not called with every keystroke
-        
-        // we want to update the searchResultsViewController
-        print(safeQuery)
+        // we want to optimize the API calls so the API is not called with every keystroke COMPLETED
+        searchTimer?.invalidate()
+        searchTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
+            NetworkManager.shared.search(query: safeQuery) { results in
+                switch results
+                {
+                case .success(let stockSearchResult):
+                    DispatchQueue.main.async {
+                        resultsVC.networkDelegate?.retrievedData(model: stockSearchResult)
+                    }
+                case .failure(_):
+                    DispatchQueue.main.async {
+                        let alertController = UIAlertController(title: "Error", message: "Unable to get stock for ticker symbol", preferredStyle: .alert)
+                        let actionButton = UIAlertAction(title: "Ok", style: .default, handler: nil)
+                        alertController.addAction(actionButton)
+                        self.present(alertController, animated: true, completion: nil)
+                    }
+                }
+            }
+        }
     }
-    
-    
-    
-    
-    
+}
+
+extension WatchListViewController : DidSelectSearchResultCell
+{
+    func searchResultSelected(model: Stock)
+    {
+        print(model)
+        let stockDetailVC = StockDetailsViewController()
+        let navVC = UINavigationController(rootViewController: stockDetailVC)
+        stockDetailVC.title = model.description
+        present(navVC, animated: true, completion: nil)
+    }
+}
+
+
+extension WatchListViewController : FloatingPanelControllerDelegate
+{
+    func floatingPanelDidChangeState(_ fpc: FloatingPanelController)
+    {
+        navigationItem.titleView?.isHidden = fpc.state == .full
+    }
 }

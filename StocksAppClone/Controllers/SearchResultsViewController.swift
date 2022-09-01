@@ -14,10 +14,11 @@ class SearchResultsViewController: UIViewController {
         let table = UITableView()
         table.register(SearchResultTableViewCell.self, forCellReuseIdentifier: SearchResultTableViewCell.idenfitifer)
         table.isHidden = true
+        //table.backgroundColor = .blue
         return table
     }()
     internal var stockResults = [Stock]()
-    internal var delegate : DidSelectSearchResultCell?
+    internal var selectionDelegate : DidSelectSearchResultCell?
     internal var networkDelegate : NetworkCallComplete?
     
     // MARK: - UI Functions
@@ -31,6 +32,7 @@ class SearchResultsViewController: UIViewController {
         view.addSubview(tableView)
         tableView.delegate = self
         tableView.dataSource = self
+        
     }
     
     
@@ -83,7 +85,8 @@ extension SearchResultsViewController : UITableViewDelegate, UITableViewDataSour
     {
         tableView.deselectRow(at: indexPath, animated: true)
         // so here what we want to do here is construct the model based off what was selected
-        //delegate?.searchResultSelected(model: <#T##StockSearchResult#>)
+        let stockSelected = stockResults[indexPath.row]
+        selectionDelegate?.searchResultSelected(model: stockSelected)
     }
 }
 
