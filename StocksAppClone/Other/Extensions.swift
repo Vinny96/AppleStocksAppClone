@@ -48,3 +48,13 @@ extension UIView
     }
 }
 
+//MARK: - Extending Dateformatter
+extension DateFormatter
+{
+    static let newsDateFormatter : DateFormatter = {
+        let dateformatterToReturn = DateFormatter()
+        dateformatterToReturn.dateFormat = "YYYY-MM-dd"
+        return dateformatterToReturn
+    }()
+    
+}
