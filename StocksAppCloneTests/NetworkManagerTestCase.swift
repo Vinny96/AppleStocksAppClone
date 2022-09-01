@@ -52,6 +52,7 @@ class NetworkManagerTestCase: XCTestCase {
             switch result
             {
             case .success(let topNewsResultArray):
+                print(topNewsResultArray)
                 XCTAssert(topNewsResultArray.isEmpty == false)
                 expectation.fulfill()
             case .failure(let error):
@@ -59,6 +60,29 @@ class NetworkManagerTestCase: XCTestCase {
                 XCTFail(error.localizedDescription)
             }
         }
+    }
+    
+    func test_GetCompanyNews_WithStockSmybol()
+    {
+        let expectation = self.expectation(description: "Getting company news for a specific stock has succeeded")
+        let networkHandler = NetworkManager.shared
+        defer {
+            waitForExpectations(timeout: 5, handler: nil)
+        }
+        
+        networkHandler.getNewsForCompany(stockSymbol: "AAPL") { result in
+            switch result
+            {
+            case .success(let newsResultObj):
+                print(newsResultObj)
+                XCTAssert(!newsResultObj.isEmpty)
+                expectation.fulfill()
+            case .failure(let error):
+                print(error)
+                XCTFail()
+            }
+        }
+        
     }
     
 
